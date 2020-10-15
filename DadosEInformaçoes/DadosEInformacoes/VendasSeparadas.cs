@@ -31,23 +31,6 @@ namespace DadosEInformacoes
             GerarRelatorio(tableNotas, tableServico);
         }
 
-        [TestMethod]
-        public void InserirVendasAtrasadas()
-        {
-            CarregarNomes();
-            CriarConexaoSQL();
-
-            FbConnectionStringBuilder fbcs = new FbConnectionStringBuilder();
-            fbcs.ConnectionString = strConn;
-            fbcs.Charset = "WIN1252";
-
-            FbConnection fbConn = new FbConnection(fbcs.ToString());
-
-            DataTable tableNotas = PegarDadosNotas(fbcs, fbConn);
-
-            SalvarRevisoesAtrasadas(tableNotas);
-        }
-
         private string strConn = @"DataSource=localhost; Database=D:\Thiago\DadosEInformacoes\Irmãos Neto\Dados.FDB; User=sysdba; password=masterkey";
         private string strconSQL = "Server=Intel;Database=DadosEInformacoes;Integrated Security=True;";
         private SqlConnection conexao;
@@ -110,49 +93,6 @@ namespace DadosEInformacoes
             commandServico.Parameters.Add("@VlrUnit", SqlDbType.Decimal);
             commandServico.Parameters.Add("@QntItens", SqlDbType.Int);
             commandServico.Parameters.Add("@VlrTotal", SqlDbType.Decimal);
-            #endregion
-
-            #region REvisão Atrasada
-            string strcmdRevisaoAtrasada = @"INSERT INTO[dbo].[VendasAtrasadas]
-                                          ([NomeCliente]
-                                          ,[IdentificacaoCliente]
-                                          ,[UltimaRevisao]
-                                          ,[TicketMedio]
-                                          ,[TipoPessoa]
-                                          ,[Sexo]
-                                          ,[Veiculo]
-                                          ,[Placa]
-                                          ,[Ano]
-                                          ,[Km]
-                                          ,[FaixaAno]
-                                          ,[FaixaTicketMedio])
-                                    VALUES
-                                          (@NomeCliente
-                                           ,@IdentificacaoCliente
-                                           ,@UltimaRevisao
-                                           ,@TicketMedio
-                                           ,@TipoPessoa
-                                           ,@Sexo
-                                           ,@Veiculo
-                                           ,@Placa
-                                           ,@Ano
-                                           ,@Km
-                                           ,@FaixaAno
-                                           ,@FaixaTicketMedio)";
-            commandRevisaoAtrasada = new SqlCommand(strcmdRevisaoAtrasada, conexao);
-            commandRevisaoAtrasada.Parameters.Add("@NomeCliente", SqlDbType.VarChar);
-            commandRevisaoAtrasada.Parameters.Add("@IdentificacaoCliente", SqlDbType.BigInt);
-            commandRevisaoAtrasada.Parameters.Add("@UltimaRevisao", SqlDbType.DateTime);
-            commandRevisaoAtrasada.Parameters.Add("@TicketMedio", SqlDbType.Decimal);
-            commandRevisaoAtrasada.Parameters.Add("@TipoPessoa", SqlDbType.VarChar);
-            commandRevisaoAtrasada.Parameters.Add("@Sexo", SqlDbType.VarChar);
-            commandRevisaoAtrasada.Parameters.Add("@Veiculo", SqlDbType.VarChar);
-            commandRevisaoAtrasada.Parameters.Add("@Ano", SqlDbType.VarChar);
-            commandRevisaoAtrasada.Parameters.Add("@Placa", SqlDbType.VarChar);
-            commandRevisaoAtrasada.Parameters.Add("@Km", SqlDbType.VarChar);
-            commandRevisaoAtrasada.Parameters.Add("@FaixaAno", SqlDbType.VarChar);
-            commandRevisaoAtrasada.Parameters.Add("@FaixaTicketMedio", SqlDbType.VarChar);
-
             #endregion
         }
         private void CarregarNomes()
@@ -276,15 +216,6 @@ namespace DadosEInformacoes
             #region Montar Relatório Clientes e vendas
             SalvarDadosVendas(dicVendas);
             #endregion
-        }
-        private void SalvarRevisoesAtrasadas(DataTable tableNotas)
-        {
-            Dictionary<long, ClienteSeparado> dicVendas = new Dictionary<long, ClienteSeparado>();
-            MontarDicionarioVendas(tableNotas, dicVendas);
-
-            CalcularTicketMedio(dicVendas);
-            PegarInfosVeiculos(dicVendas);
-            RevisoesAtrasadas(dicVendas);
         }
         private void PegarInfosVeiculos(Dictionary<long, ClienteSeparado> dicVendas)
         {
@@ -545,53 +476,6 @@ namespace DadosEInformacoes
             {
                 return "Não identificado";
             }
-        }
-        private void RevisoesAtrasadas(Dictionary<long, ClienteSeparado> dicVendas)
-        {
-            foreach (ClienteSeparado cliente in dicVendas.Values)
-            {
-                bool revisao2anos = false;
-                bool revisao1anos = false;
-                bool revisaoAnoAtual = false;
-
-                foreach (Venda venda in cliente.ListaVendas)
-                {
-                    if (venda.Data.Year == DateTime.Now.AddYears(-2).Year)
-                        revisao2anos = true;
-                    else if (venda.Data.Year == DateTime.Now.AddYears(-1).Year)
-                        revisao1anos = true;
-                    else if (venda.Data.Year == DateTime.Now.Year)
-                        revisaoAnoAtual = true;
-                }
-
-                if (revisao2anos && revisao1anos && !revisaoAnoAtual)
-                    cliente.RevisaoAtrasada = true;
-            }
-
-
-            List<ClienteSeparado> clienteRevisaoAtrasada = new List<ClienteSeparado>();
-            clienteRevisaoAtrasada = dicVendas.Values.Where(v => v.RevisaoAtrasada == true).ToList();
-
-            conexao.Open();
-            foreach (ClienteSeparado cliente in clienteRevisaoAtrasada)
-            {
-                Venda venda = cliente.ListaVendas.OrderByDescending(pet => pet.Data).FirstOrDefault();
-
-                commandRevisaoAtrasada.Parameters["@NomeCliente"].Value = cliente.Nome;
-                commandRevisaoAtrasada.Parameters["@IdentificacaoCliente"].Value = cliente.Indentificacao;
-                commandRevisaoAtrasada.Parameters["@UltimaRevisao"].Value = cliente.UltimaVenda;
-                commandRevisaoAtrasada.Parameters["@TicketMedio"].Value = cliente.TicketMedio;
-                commandRevisaoAtrasada.Parameters["@TipoPessoa"].Value = cliente.TipoPessoa;
-                commandRevisaoAtrasada.Parameters["@Sexo"].Value = cliente.Sexo;
-                commandRevisaoAtrasada.Parameters["@Veiculo"].Value = String.IsNullOrEmpty(venda.Veiculo) ? "Não Identificado" : venda.Veiculo;
-                commandRevisaoAtrasada.Parameters["@Ano"].Value = String.IsNullOrEmpty(venda.Ano) ? "Não Identificado" : venda.Ano;
-                commandRevisaoAtrasada.Parameters["@Placa"].Value = String.IsNullOrEmpty(venda.Placa) ? "Não Identificado" : venda.Placa;
-                commandRevisaoAtrasada.Parameters["@Km"].Value = String.IsNullOrEmpty(venda.KM) ? "Não Identificado" : venda.KM;
-                commandRevisaoAtrasada.Parameters["@FaixaAno"].Value = String.IsNullOrEmpty(venda.FaixaAno) ? "Não Identificado" : venda.FaixaAno;
-                commandRevisaoAtrasada.Parameters["@FaixaTicketmedio"].Value = cliente.FaixaTicketMedio;
-                commandRevisaoAtrasada.ExecuteNonQuery();
-            }
-            conexao.Close();
         }
         private void SalvarDadosServicos(DataTable tableServico)
         {
