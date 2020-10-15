@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[VendaAtrasada]
+﻿CREATE TABLE [dbo].[VendasAtrasadas]
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
     [NomeCliente] VARCHAR(200) NULL, 

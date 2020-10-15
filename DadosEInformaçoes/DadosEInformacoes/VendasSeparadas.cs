@@ -44,7 +44,6 @@ namespace DadosEInformacoes
             FbConnection fbConn = new FbConnection(fbcs.ToString());
 
             DataTable tableNotas = PegarDadosNotas(fbcs, fbConn);
-            DataTable tableServico = PegarDadosServicos(fbcs, fbConn);
 
             SalvarRevisoesAtrasadas(tableNotas);
         }
@@ -278,7 +277,6 @@ namespace DadosEInformacoes
             SalvarDadosVendas(dicVendas);
             #endregion
         }
-
         private void SalvarRevisoesAtrasadas(DataTable tableNotas)
         {
             Dictionary<long, Cliente> dicVendas = new Dictionary<long, Cliente>();

@@ -1,19 +1,19 @@
 ﻿CREATE TABLE [dbo].[VendasAgrupadas]
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
-    [Nome] VARCHAR(200) NULL, 
+    [Nome] VARCHAR(MAX) NULL, 
     [Identificacao] BIGINT NULL, 
-    [TipoPessoa] VARCHAR(50) NULL, 
-    [Sexo] VARCHAR(50) NULL, 
+    [TipoPessoa] VARCHAR(MAX) NULL, 
+    [Sexo] VARCHAR(MAX) NULL, 
     [TicketMedio] DECIMAL(18, 2) NULL, 
     [UltimaVenda] DATETIME NULL, 
     [ValorTotalAgrupado] DECIMAL(18, 2) NULL, 
     [DataVenda] DATETIME NULL, 
-    [IdNFAgrupado] VARCHAR(50) NULL, 
-    [Veiculo] VARCHAR(50) NULL, 
-    [Ano] VARCHAR(50) NULL, 
-    [Placa] VARCHAR(50) NULL, 
-    [Km] VARCHAR(50) NULL, 
-    [FaixaAno] VARCHAR(50) NULL, 
-    [FaixaTicketMedio] VARCHAR(50) NULL
+    [IdNFAgrupado] VARCHAR(MAX) NULL, 
+    [Veiculo] VARCHAR(MAX) NULL, 
+    [Ano] VARCHAR(MAX) NULL, 
+    [Placa] VARCHAR(MAX) NULL, 
+    [Km] VARCHAR(MAX) NULL, 
+    [FaixaAno] VARCHAR(MAX) NULL, 
+    [FaixaTicketMedio] VARCHAR(MAX) NULL
 )

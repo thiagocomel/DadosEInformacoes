@@ -102,6 +102,22 @@ namespace DadosEInformacoes
 
             this.IdsNF.Sort();
         }
+
+        public void CalcularTicketMedio()
+        {
+            this.TicketMedio = ValorTotalAgrupado / ValoresTotais.Count;
+
+            if (TicketMedio < 200)
+                this.FaixaTicketMedio = "Muito Baixo";
+            else if (TicketMedio < 350)
+                this.FaixaTicketMedio = "Baixo";
+            else if (TicketMedio < 600)
+                this.FaixaTicketMedio = "Médio";
+            else if (TicketMedio < 750)
+                this.FaixaTicketMedio = "Alto";
+            else
+                this.FaixaTicketMedio = "Muito Alto";
+        }
     }
 
     public class IdentificacaoVenda
@@ -133,7 +149,7 @@ namespace DadosEInformacoes
     [TestClass]
     public class VendasAgrupadas
     {
-        private const string CONNECTION_STRING = "Server=exemplo-dns.eastus.cloudapp.azure.com,1433;Database=Exemplo-DB-01;User Id=exemplo-user-01;Password=123456789Ab@;";
+        private const string CONNECTION_STRING = "Server=Intel;Database=DadosEInformacoes;Integrated Security=True;";
 
         private IDbConnection _db;
 
@@ -162,7 +178,7 @@ namespace DadosEInformacoes
                           ,[Km]
                           ,[FaixaAno]
                           ,[FaixaTicketMedio]
-                      FROM [Exemplo-DB-01].[dbo].[Vendas]";
+                      FROM [dbo].[Vendas]";
 
             var vendasSeparadas = _db.Query<VendaSeparada>(sql);
 
@@ -190,7 +206,7 @@ namespace DadosEInformacoes
                           ,[FaixaAno]
                           ,[FaixaTicketMedio]
                       FROM 
-                           [Exemplo-DB-01].[dbo].[Vendas]
+                          [dbo].[Vendas]
  
                       WHERE [Nome]='ALEXANDRE RECH'";
 
@@ -220,7 +236,7 @@ namespace DadosEInformacoes
                           ,[FaixaAno]
                           ,[FaixaTicketMedio]
                       FROM 
-                           [Exemplo-DB-01].[dbo].[Vendas]
+                           [dbo].[Vendas]
  
                       WHERE [Nome]='ALEXANDRE RECH'";
 
@@ -252,7 +268,7 @@ namespace DadosEInformacoes
                           ,[FaixaAno]
                           ,[FaixaTicketMedio]
                       FROM 
-                           [Exemplo-DB-01].[dbo].[Vendas]
+                           [dbo].[Vendas]
  
                       WHERE [IdNF] > 22 and [IdNF] < 110  order by [IdNF]";
 
@@ -287,7 +303,7 @@ namespace DadosEInformacoes
                           ,[FaixaAno]
                           ,[FaixaTicketMedio]
                       FROM 
-                           [Exemplo-DB-01].[dbo].[Vendas]";
+                           [dbo].[Vendas]";
 
             var vendasSeparadas = _db.Query<VendaSeparada>(sqlSelect);
 
@@ -355,6 +371,8 @@ namespace DadosEInformacoes
                     vendaAgrupada.AdicionarValorTotal(item.ValorTotal);
 
                     vendaAgrupada.AdicionarIdNF(item.IdNF);
+
+                    vendaAgrupada.CalcularTicketMedio();
                 }
             }
 
