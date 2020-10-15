@@ -29,7 +29,6 @@ namespace DadosEInformacoes
         public string FaixaTicketMedio { get; set; }
 
     }
-
     public class VendaAgrupada
     {
         public string Nome { get; set; }
@@ -97,7 +96,6 @@ namespace DadosEInformacoes
                 this.FaixaTicketMedio = "Muito Alto";
         }
     }
-
     public class Cliente
     {
         public long Indentificacao;
@@ -165,7 +163,17 @@ namespace DadosEInformacoes
             return hashCode;
         }
     }
-
+    public class Servico
+    {
+        public int IDNF;
+        public string TipoServico;
+        public string NomeServico;
+        public string Funcionario;
+        public string Tempo;
+        public double VlrUnit;
+        public int QntItens;
+        public double VlrTotal;
+    }
     [TestClass]
     public class VendasAgrupadas
     {

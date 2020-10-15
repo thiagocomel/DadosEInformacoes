@@ -26,9 +26,26 @@ namespace DadosEInformacoes
             FbConnection fbConn = new FbConnection(fbcs.ToString());
 
             DataTable tableNotas = PegarDadosNotas(fbcs, fbConn);
+
+            SalvarDadosVendas(tableNotas);
+            
+        }
+
+        [TestMethod]
+        public void InserirServicosSeparadas()
+        {
+            CarregarNomes();
+            CriarConexaoSQL();
+
+            FbConnectionStringBuilder fbcs = new FbConnectionStringBuilder();
+            fbcs.ConnectionString = strConn;
+            fbcs.Charset = "WIN1252";
+
+            FbConnection fbConn = new FbConnection(fbcs.ToString());
+
             DataTable tableServico = PegarDadosServicos(fbcs, fbConn);
 
-            GerarRelatorio(tableNotas, tableServico);
+            SalvarDadosServicos(tableServico);
         }
 
         private string strConn = @"DataSource=localhost; Database=D:\Thiago\DadosEInformacoes\Irmãos Neto\Dados.FDB; User=sysdba; password=masterkey";
@@ -196,13 +213,6 @@ namespace DadosEInformacoes
                 fbConn.Close();
             }
             return dtSales;
-        }
-        private void GerarRelatorio(DataTable tableNotas, DataTable tableServico)
-        {
-            //SalvarDadosServicos(tableServico);
-            SalvarDadosVendas(tableNotas);
-
-
         }
         private void SalvarDadosVendas(DataTable tableNotas)
         {
@@ -479,11 +489,11 @@ namespace DadosEInformacoes
         }
         private void SalvarDadosServicos(DataTable tableServico)
         {
-            List<Servico> listServices = new List<Servico>();
+            List<ServicoSeparado> listServices = new List<ServicoSeparado>();
 
             foreach (DataRow row in tableServico.Rows)
             {
-                Servico servico = new Servico();
+                ServicoSeparado servico = new ServicoSeparado();
                 servico.IDNF = Convert.ToInt32(row[0]);
                 servico.TipoServico = row[1].ToString();
                 servico.NomeServico = row[2].ToString();
@@ -498,7 +508,7 @@ namespace DadosEInformacoes
             try
             {
                 conexao.Open();
-                foreach (Servico servico in listServices)
+                foreach (ServicoSeparado servico in listServices)
                 {
                     commandServico.Parameters["@IDNF"].Value = servico.IDNF;
                     commandServico.Parameters["@TipoServico"].Value = servico.TipoServico;
@@ -558,7 +568,7 @@ namespace DadosEInformacoes
         public string FaixaAno;
     }
 
-    public class Servico
+    public class ServicoSeparado
     {
         public int IDNF;
         public string TipoServico;

@@ -16,6 +16,5 @@ D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\obj\Deb
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\obj\Debug\DadosEInformacoes.csproj.CopyComplete
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\obj\Debug\DadosEInformacoes.dll
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\obj\Debug\DadosEInformacoes.pdb
-D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\obj\Debug\DadosEInformacoes.csprojAssemblyReference.cache
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\bin\Debug\FirebirdSql.Data.FirebirdClient.dll
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\bin\Debug\Arquivos\nomes.csv
