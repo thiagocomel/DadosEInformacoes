@@ -168,7 +168,7 @@ namespace DadosEInformacoes
                                                           empresa_nf as nf left join
                                                           empresa_nf_prod as prod on prod.idnf = nf.idnf inner join
                                                           empresa_conta as conta on conta.idconta = nf.idconta
-                                                 where nf.cancelada = 'N' and  nf.terceiro = 'N' and nf.idnatoperacao not in (11, 12, 58, 53, 54, 36,37)
+                                                 where nf.cancelada = 'N' and  nf.terceiro = 'N' and nf.idnatoperacao not in (10,11,12,36,37,52,53,54,58)
                                                 group by
                                                     nf.idnf,
                                                     conta.nome,
