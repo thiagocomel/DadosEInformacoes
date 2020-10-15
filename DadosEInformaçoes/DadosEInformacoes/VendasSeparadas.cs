@@ -266,7 +266,7 @@ namespace DadosEInformacoes
         }
         private void SalvarDadosVendas(DataTable tableNotas)
         {
-            Dictionary<long, Cliente> dicVendas = new Dictionary<long, Cliente>();
+            Dictionary<long, ClienteSeparado> dicVendas = new Dictionary<long, ClienteSeparado>();
             MontarDicionarioVendas(tableNotas, dicVendas);
 
             CalcularTicketMedio(dicVendas);
@@ -279,18 +279,18 @@ namespace DadosEInformacoes
         }
         private void SalvarRevisoesAtrasadas(DataTable tableNotas)
         {
-            Dictionary<long, Cliente> dicVendas = new Dictionary<long, Cliente>();
+            Dictionary<long, ClienteSeparado> dicVendas = new Dictionary<long, ClienteSeparado>();
             MontarDicionarioVendas(tableNotas, dicVendas);
 
             CalcularTicketMedio(dicVendas);
             PegarInfosVeiculos(dicVendas);
             RevisoesAtrasadas(dicVendas);
         }
-        private void PegarInfosVeiculos(Dictionary<long, Cliente> dicVendas)
+        private void PegarInfosVeiculos(Dictionary<long, ClienteSeparado> dicVendas)
         {
             foreach (long identificacao in dicVendas.Keys)
             {
-                Cliente vendas = dicVendas[identificacao];
+                ClienteSeparado vendas = dicVendas[identificacao];
                 foreach (Venda venda in vendas.ListaVendas)
                 {
                     if (venda.DadosAdicionais.Length > 20 && !venda.DadosAdicionais.Contains("DIV-    ") &&
@@ -390,14 +390,14 @@ namespace DadosEInformacoes
                 }
             }
         }
-        private void SalvarDadosVendas(Dictionary<long, Cliente> dicVendas)
+        private void SalvarDadosVendas(Dictionary<long, ClienteSeparado> dicVendas)
         {
             try
             {
                 conexao.Open();
                 foreach (long identificacao in dicVendas.Keys)
                 {
-                    Cliente cliente = dicVendas[identificacao];
+                    ClienteSeparado cliente = dicVendas[identificacao];
                     foreach (Venda venda in cliente.ListaVendas)
                     {
                         command.Parameters["@nome"].Value = cliente.Nome;
@@ -427,11 +427,11 @@ namespace DadosEInformacoes
 
             }
         }
-        private void MontarDicionarioVendas(DataTable tableNotas, Dictionary<long, Cliente> dicVendas)
+        private void MontarDicionarioVendas(DataTable tableNotas, Dictionary<long, ClienteSeparado> dicVendas)
         {
             foreach (DataRow row in tableNotas.Rows)
             {
-                Cliente cliente = new Cliente();
+                ClienteSeparado cliente = new ClienteSeparado();
                 cliente.Nome = row[1].ToString();
                 if (row[2].ToString() != String.Empty)
                     cliente.Indentificacao = Convert.ToInt64(row[2]);
@@ -463,7 +463,7 @@ namespace DadosEInformacoes
                 }
             }
         }
-        private void CalcularTicketMedio(Dictionary<long, Cliente> dicVendas)
+        private void CalcularTicketMedio(Dictionary<long, ClienteSeparado> dicVendas)
         {
             double valorTotalTicketMedio = 0;
             int totalVendas = 0;
@@ -546,9 +546,9 @@ namespace DadosEInformacoes
                 return "Não identificado";
             }
         }
-        private void RevisoesAtrasadas(Dictionary<long, Cliente> dicVendas)
+        private void RevisoesAtrasadas(Dictionary<long, ClienteSeparado> dicVendas)
         {
-            foreach (Cliente cliente in dicVendas.Values)
+            foreach (ClienteSeparado cliente in dicVendas.Values)
             {
                 bool revisao2anos = false;
                 bool revisao1anos = false;
@@ -569,11 +569,11 @@ namespace DadosEInformacoes
             }
 
 
-            List<Cliente> clienteRevisaoAtrasada = new List<Cliente>();
+            List<ClienteSeparado> clienteRevisaoAtrasada = new List<ClienteSeparado>();
             clienteRevisaoAtrasada = dicVendas.Values.Where(v => v.RevisaoAtrasada == true).ToList();
 
             conexao.Open();
-            foreach (Cliente cliente in clienteRevisaoAtrasada)
+            foreach (ClienteSeparado cliente in clienteRevisaoAtrasada)
             {
                 Venda venda = cliente.ListaVendas.OrderByDescending(pet => pet.Data).FirstOrDefault();
 
@@ -645,7 +645,7 @@ namespace DadosEInformacoes
         }
     }
 
-    public class Cliente
+    public class ClienteSeparado
     {
         public long Indentificacao;
         public string Nome;

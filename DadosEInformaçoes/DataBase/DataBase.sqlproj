@@ -62,4 +62,7 @@
     <Build Include="VendasAtrasadas.sql" />
     <Build Include="VendasAgrupadas.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="DataBase.refactorlog" />
+  </ItemGroup>
 </Project>

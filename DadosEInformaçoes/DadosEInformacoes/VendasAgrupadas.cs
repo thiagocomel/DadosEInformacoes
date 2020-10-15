@@ -32,26 +32,6 @@ namespace DadosEInformacoes
 
     public class VendaAgrupada
     {
-        public VendaAgrupada(VendaSeparada item)
-        {
-            this.Nome = item.Nome;
-            this.Identificacao = item.Identificacao;
-            this.TipoPessoa = item.TipoPessoa;
-            this.Sexo = item.Sexo;
-            this.TicketMedio = item.TicketMedio;
-            this.UltimaVenda = item.UltimaVenda;
-            this.DataVenda = item.DataVenda;
-            this.Veiculo = item.Veiculo;
-            this.Ano = item.Ano;
-            this.Placa = item.Placa;
-            this.Km = item.Km;
-            this.FaixaAno = item.FaixaAno;
-            this.FaixaTicketMedio = item.FaixaTicketMedio;
-
-            this.AdicionarValorTotal(item.ValorTotal);
-            this.AdicionarIdNF(item.IdNF);
-        }
-
         public string Nome { get; set; }
         public long Identificacao { get; set; }
         public string TipoPessoa { get; set; }
@@ -103,10 +83,8 @@ namespace DadosEInformacoes
             this.IdsNF.Sort();
         }
 
-        public void CalcularTicketMedio()
+        public void ClassificarTicketMedio()
         {
-            this.TicketMedio = ValorTotalAgrupado / ValoresTotais.Count;
-
             if (TicketMedio < 200)
                 this.FaixaTicketMedio = "Muito Baixo";
             else if (TicketMedio < 350)
@@ -120,6 +98,48 @@ namespace DadosEInformacoes
         }
     }
 
+    public class Cliente
+    {
+        public long Indentificacao;
+        public string Nome;
+        public decimal TicketMedio;
+        public string FaixaTicketMedio;
+        public DateTime UltimaVenda;
+        public string Sexo;
+        public string TipoPessoa;
+        public List<VendaAgrupada> ListaVendas = new List<VendaAgrupada>();
+        public bool RevisaoAtrasada;
+    }
+    public class VendaAtrasada
+    {
+        public VendaAtrasada(VendaAgrupada item)
+        {
+            this.Nome = item.Nome;
+            this.Identificacao = item.Identificacao;
+            this.TipoPessoa = item.TipoPessoa;
+            this.Sexo = item.Sexo;
+            this.TicketMedio = item.TicketMedio;
+            this.UltimaVenda = item.UltimaVenda;
+            this.Veiculo = item.Veiculo;
+            this.Ano = item.Ano;
+            this.Placa = item.Placa;
+            this.Km = item.Km;
+            this.FaixaAno = item.FaixaAno;
+            this.FaixaTicketMedio = item.FaixaTicketMedio;
+        }
+        public string Nome { get; set; }
+        public long Identificacao { get; set; }
+        public DateTime UltimaVenda { get; set; }
+        public decimal TicketMedio { get; set; }
+        public string TipoPessoa { get; set; }
+        public string Sexo { get; set; }
+        public string Veiculo { get; set; }
+        public string Ano { get; set; }
+        public string Placa { get; set; }
+        public string Km { get; set; }
+        public string FaixaAno { get; set; }
+        public string FaixaTicketMedio { get; set; }
+    }
     public class IdentificacaoVenda
     {
         public DateTime DataVenda { get; set; }
@@ -342,8 +362,6 @@ namespace DadosEInformacoes
                                 ,@FaixaAno
                                 ,@FaixaTicketMedio)";
 
-            //_db.Query(sqlInsert, vendasAgrupadas);
-
             using (var connection = new SqlConnection(CONNECTION_STRING))
             {
                 var affectedRows = connection.Execute(sqlInsert, vendasAgrupadas);
@@ -352,6 +370,109 @@ namespace DadosEInformacoes
             }
         }
 
+        [TestMethod]
+        public void InserirVendasAtrasadas_Ok()
+        {
+            var sqlSelect = @"SELECT [Nome]
+                          ,[Identificacao]
+                          ,[TipoPessoa]
+                          ,[Sexo]
+                          ,[TicketMedio]
+                          ,[UltimaVenda]
+                          ,[ValorTotalAgrupado]
+                          ,[DataVenda]
+                          ,[IdNFAgrupado]
+                          ,[Veiculo]
+                          ,[Ano]
+                          ,[Placa]
+                          ,[Km]
+                          ,[FaixaAno]
+                          ,[FaixaTicketMedio]
+                      FROM 
+                           [dbo].[VendasAgrupadas]";
+
+            var vendasAgrupadas = _db.Query<VendaAgrupada>(sqlSelect).ToList();
+
+            Dictionary<long, Cliente> dicVendas = new Dictionary<long, Cliente>();
+            List<VendaAtrasada> vendasAtrasadas = new List<VendaAtrasada>();
+            foreach (VendaAgrupada venda in vendasAgrupadas)
+            {
+                if (dicVendas.ContainsKey(venda.Identificacao))
+                    dicVendas[venda.Identificacao].ListaVendas.Add(venda);
+                else
+                {
+                    Cliente cliente = new Cliente
+                    {
+                        FaixaTicketMedio = venda.FaixaTicketMedio,
+                        Indentificacao = venda.Identificacao,
+                        Nome = venda.Nome,
+                        Sexo = venda.Sexo,
+                        TicketMedio = venda.TicketMedio,
+                        TipoPessoa = venda.TipoPessoa,
+                        UltimaVenda = venda.UltimaVenda
+                    };
+                    dicVendas.Add(venda.Identificacao, cliente);
+                    dicVendas[cliente.Indentificacao].ListaVendas.Add(venda);
+                }
+            }
+
+            foreach (Cliente cliente in dicVendas.Values)
+            {
+                bool revisao2anos = false;
+                bool revisao1anos = false;
+                bool revisaoAnoAtual = false;
+
+                foreach (VendaAgrupada venda in cliente.ListaVendas)
+                {
+                    if (venda.DataVenda.Year == DateTime.Now.AddYears(-2).Year)
+                        revisao2anos = true;
+                    else if (venda.DataVenda.Year == DateTime.Now.AddYears(-1).Year)
+                        revisao1anos = true;
+                    else if (venda.DataVenda.Year == DateTime.Now.Year)
+                        revisaoAnoAtual = true;
+                }
+
+                if (revisao2anos && revisao1anos && !revisaoAnoAtual)
+                {
+                    cliente.RevisaoAtrasada = true;
+                    vendasAtrasadas.Add(new VendaAtrasada(cliente.ListaVendas.LastOrDefault()));
+                }
+            }
+
+            var sqlInsert = @"INSERT INTO[dbo].[VendasAtrasadas]
+                                          ([Nome]
+                                          ,[Identificacao]
+                                          ,[UltimaVenda]
+                                          ,[TicketMedio]
+                                          ,[TipoPessoa]
+                                          ,[Sexo]
+                                          ,[Veiculo]
+                                          ,[Placa]
+                                          ,[Ano]
+                                          ,[Km]
+                                          ,[FaixaAno]
+                                          ,[FaixaTicketMedio])
+                                    VALUES
+                                          (@Nome
+                                           ,@Identificacao
+                                           ,@UltimaVenda
+                                           ,@TicketMedio
+                                           ,@TipoPessoa
+                                           ,@Sexo
+                                           ,@Veiculo
+                                           ,@Placa
+                                           ,@Ano
+                                           ,@Km
+                                           ,@FaixaAno
+                                           ,@FaixaTicketMedio)";
+
+            using (var connection = new SqlConnection(CONNECTION_STRING))
+            {
+                var affectedRows = connection.Execute(sqlInsert, vendasAtrasadas);
+
+                Console.WriteLine($"Affected Rows: {affectedRows}");
+            }
+        }
         private List<VendaAgrupada> AgruparVendas(IEnumerable<VendaSeparada> vendasSeparadas)
         {
             var vendasAgrupadas = new Dictionary<IdentificacaoVenda, VendaAgrupada>();
@@ -362,7 +483,25 @@ namespace DadosEInformacoes
 
                 if (!vendasAgrupadas.ContainsKey(id))
                 {
-                    vendasAgrupadas.Add(id, new VendaAgrupada(item));
+                    VendaAgrupada vendaAgrupada = new VendaAgrupada();
+
+                    vendaAgrupada.Nome = item.Nome;
+                    vendaAgrupada.Identificacao = item.Identificacao;
+                    vendaAgrupada.TipoPessoa = item.TipoPessoa;
+                    vendaAgrupada.Sexo = item.Sexo;
+                    vendaAgrupada.TicketMedio = item.TicketMedio;
+                    vendaAgrupada.UltimaVenda = item.UltimaVenda;
+                    vendaAgrupada.DataVenda = item.DataVenda;
+                    vendaAgrupada.Veiculo = item.Veiculo;
+                    vendaAgrupada.Ano = item.Ano;
+                    vendaAgrupada.Placa = item.Placa;
+                    vendaAgrupada.Km = item.Km;
+                    vendaAgrupada.FaixaAno = item.FaixaAno;
+                    vendaAgrupada.FaixaTicketMedio = item.FaixaTicketMedio;
+                    
+                    vendaAgrupada.AdicionarValorTotal(item.ValorTotal);
+                    vendaAgrupada.AdicionarIdNF(item.IdNF);
+                    vendasAgrupadas.Add(id, vendaAgrupada);
                 }
                 else
                 {
@@ -371,11 +510,26 @@ namespace DadosEInformacoes
                     vendaAgrupada.AdicionarValorTotal(item.ValorTotal);
 
                     vendaAgrupada.AdicionarIdNF(item.IdNF);
-
-                    vendaAgrupada.CalcularTicketMedio();
                 }
             }
 
+            foreach (IdentificacaoVenda identificacao in vendasAgrupadas.Keys)
+            {
+                List<KeyValuePair<IdentificacaoVenda, VendaAgrupada>> vendas = vendasAgrupadas.Where(x => x.Key.CPF_CNPJ == identificacao.CPF_CNPJ).ToList();
+
+                decimal valorTotal = 0;
+                DateTime ultimaVenda = DateTime.MinValue;
+                foreach (KeyValuePair<IdentificacaoVenda, VendaAgrupada> venda in vendas)
+                {
+                    valorTotal = valorTotal + venda.Value.ValorTotalAgrupado;
+                    if (ultimaVenda < venda.Key.DataVenda)
+                        ultimaVenda = venda.Key.DataVenda;
+                }
+
+                vendasAgrupadas[identificacao].TicketMedio = valorTotal / vendas.Count;
+                vendasAgrupadas[identificacao].ClassificarTicketMedio();
+                vendasAgrupadas[identificacao].UltimaVenda = ultimaVenda;
+            }
             return vendasAgrupadas.Values.OrderBy(x => x.DataVenda).ToList();
         }
     }

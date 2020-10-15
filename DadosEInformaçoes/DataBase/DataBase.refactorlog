@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="9d6cfb4e-18b5-4b98-aa8a-154946290003" ChangeDateTime="10/15/2020 18:57:03">
+    <Property Name="ElementName" Value="[dbo].[VendasAtrasadas].[NomeCliente]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VendasAtrasadas]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Nome" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="10c90961-2a39-41eb-b0a3-1996bfc05405" ChangeDateTime="10/15/2020 18:57:08">
+    <Property Name="ElementName" Value="[dbo].[VendasAtrasadas].[IdentificacaoCliente]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VendasAtrasadas]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Identificacao" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="5ac65502-84c9-486b-b5a5-a619278edac4" ChangeDateTime="10/15/2020 18:57:13">
+    <Property Name="ElementName" Value="[dbo].[VendasAtrasadas].[UltimaRevisao]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VendasAtrasadas]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="UltimaVenda" />
+  </Operation>
+</Operations>

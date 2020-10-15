@@ -1,9 +1,9 @@
 ﻿CREATE TABLE [dbo].[VendasAtrasadas]
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
-    [NomeCliente] VARCHAR(200) NULL, 
-    [IdentificacaoCliente] BIGINT NULL, 
-    [UltimaRevisao] DATETIME NULL, 
+    [Nome] VARCHAR(200) NULL, 
+    [Identificacao] BIGINT NULL, 
+    [UltimaVenda] DATETIME NULL, 
     [TicketMedio] DECIMAL(18, 2) NULL, 
     [TipoPessoa] VARCHAR(50) NULL, 
     [Sexo] VARCHAR(50) NULL, 
