@@ -27,7 +27,13 @@ namespace DadosEInformacoes
         public string Km { get; set; }
         public string FaixaAno { get; set; }
         public string FaixaTicketMedio { get; set; }
-
+        public string NomeServico { get; set; }
+        public string Funcionario { get; set; }
+        public int QtItensServico { get; set; }
+        public string TempoServico { get; set; }
+        public string TipoServico { get; set; }
+        public decimal ValorTotalServico { get; set; }
+        public decimal ValorUnitServico { get; set; }
     }
     public class VendaAgrupada
     {
@@ -44,10 +50,12 @@ namespace DadosEInformacoes
         public string Km { get; set; }
         public string FaixaAno { get; set; }
         public string FaixaTicketMedio { get; set; }
-
         public List<long> IdsNF { get; private set; }
         public List<decimal> ValoresTotais { get; private set; }
-
+        public string TipoServico { get; set; }
+        public string NomeServico { get; set; }
+        public string Funcionario { get; set; }
+        public decimal ValorTotalServico { get; set; }
         public string IdNFAgrupado
         {
             get
@@ -84,13 +92,13 @@ namespace DadosEInformacoes
 
         public void ClassificarTicketMedio()
         {
-            if (TicketMedio < 200)
+            if (TicketMedio < 350)
                 this.FaixaTicketMedio = "Muito Baixo";
-            else if (TicketMedio < 350)
+            else if (TicketMedio < 500)
                 this.FaixaTicketMedio = "Baixo";
-            else if (TicketMedio < 600)
-                this.FaixaTicketMedio = "Médio";
             else if (TicketMedio < 750)
+                this.FaixaTicketMedio = "Médio";
+            else if (TicketMedio < 1000)
                 this.FaixaTicketMedio = "Alto";
             else
                 this.FaixaTicketMedio = "Muito Alto";
@@ -163,17 +171,7 @@ namespace DadosEInformacoes
             return hashCode;
         }
     }
-    public class Servico
-    {
-        public int IDNF;
-        public string TipoServico;
-        public string NomeServico;
-        public string Funcionario;
-        public string Tempo;
-        public double VlrUnit;
-        public int QntItens;
-        public double VlrTotal;
-    }
+
     [TestClass]
     public class VendasAgrupadas
     {
@@ -206,6 +204,13 @@ namespace DadosEInformacoes
                           ,[Km]
                           ,[FaixaAno]
                           ,[FaixaTicketMedio]
+                          ,[NomeServico]
+                          ,[Funcionario]
+                          ,[QtItensServico]
+                          ,[TempoServico]
+                          ,[TipoServico]
+                          ,[ValorTotalServico]
+                          ,[ValorUnitServico]
                       FROM [dbo].[Vendas]";
 
             var vendasSeparadas = _db.Query<VendaSeparada>(sql);
@@ -330,6 +335,13 @@ namespace DadosEInformacoes
                           ,[Km]
                           ,[FaixaAno]
                           ,[FaixaTicketMedio]
+                          ,[NomeServico]
+                          ,[Funcionario]
+                          ,[QtItensServico]
+                          ,[TempoServico]
+                          ,[TipoServico]
+                          ,[ValorTotalServico]
+                          ,[ValorUnitServico]
                       FROM 
                            [dbo].[Vendas]";
 
@@ -352,7 +364,11 @@ namespace DadosEInformacoes
                                 ,[Placa]
                                 ,[Km]
                                 ,[FaixaAno]
-                                ,[FaixaTicketMedio])
+                                ,[FaixaTicketMedio]
+                                ,[TipoServico]
+                                ,[NomeServico]
+                                ,[Funcionario]
+                                ,[ValorTotalServico])
                             VALUES
                                 (@Nome
                                 ,@Identificacao
@@ -368,7 +384,11 @@ namespace DadosEInformacoes
                                 ,@Placa
                                 ,@Km
                                 ,@FaixaAno
-                                ,@FaixaTicketMedio)";
+                                ,@FaixaTicketMedio
+                                ,@TipoServico
+                                ,@NomeServico
+                                ,@Funcionario
+                                ,@ValorTotalServico)";
 
             using (var connection = new SqlConnection(CONNECTION_STRING))
             {
@@ -506,7 +526,15 @@ namespace DadosEInformacoes
                     vendaAgrupada.Km = item.Km;
                     vendaAgrupada.FaixaAno = item.FaixaAno;
                     vendaAgrupada.FaixaTicketMedio = item.FaixaTicketMedio;
-                    
+                    if (String.IsNullOrEmpty(item.TipoServico) == false)
+                        vendaAgrupada.TipoServico = item.TipoServico;
+                    if (String.IsNullOrEmpty(item.NomeServico) == false)
+                        vendaAgrupada.NomeServico = item.NomeServico;
+                    if (item.ValorTotalServico > 0)
+                        vendaAgrupada.ValorTotalServico = item.ValorTotalServico;
+                    if (String.IsNullOrEmpty(item.Funcionario) == false)
+                        vendaAgrupada.Funcionario = item.Funcionario;
+
                     vendaAgrupada.AdicionarValorTotal(item.ValorTotal);
                     vendaAgrupada.AdicionarIdNF(item.IdNF);
                     vendasAgrupadas.Add(id, vendaAgrupada);
@@ -518,6 +546,15 @@ namespace DadosEInformacoes
                     vendaAgrupada.AdicionarValorTotal(item.ValorTotal);
 
                     vendaAgrupada.AdicionarIdNF(item.IdNF);
+
+                    if (String.IsNullOrEmpty(item.TipoServico) == false)
+                        vendaAgrupada.TipoServico = item.TipoServico;
+                    if (String.IsNullOrEmpty(item.NomeServico) == false)
+                        vendaAgrupada.NomeServico = item.NomeServico;
+                    if (item.ValorTotalServico > 0)
+                        vendaAgrupada.ValorTotalServico = item.ValorTotalServico;
+                    if (String.IsNullOrEmpty(item.Funcionario) == false)
+                        vendaAgrupada.Funcionario = item.Funcionario;
                 }
             }
 

@@ -17,5 +17,12 @@
     [Placa] VARCHAR(20) NULL, 
     [Km] VARCHAR(20) NULL, 
     [FaixaAno] VARCHAR(50) NULL, 
-    [FaixaTicketMedio] VARCHAR(50) NULL 
+    [FaixaTicketMedio] VARCHAR(50) NULL, 
+    [NomeServico] VARCHAR(200) NULL, 
+    [Funcionario] VARCHAR(200) NULL, 
+    [QtItensServico] INT NULL, 
+    [TempoServico] VARCHAR(20) NULL, 
+    [TipoServico] VARCHAR(200) NULL, 
+    [ValorTotalServico] DECIMAL(18, 2) NULL, 
+    [ValorUnitServico] DECIMAL(18, 2) NULL 
 )

@@ -15,5 +15,10 @@
     [Placa] VARCHAR(MAX) NULL, 
     [Km] VARCHAR(MAX) NULL, 
     [FaixaAno] VARCHAR(MAX) NULL, 
-    [FaixaTicketMedio] VARCHAR(MAX) NULL
+    [FaixaTicketMedio] VARCHAR(MAX) NULL, 
+    [TipoServico] VARCHAR(200) NULL, 
+    [NomeServico] VARCHAR(200) NULL, 
+    [Funcionario] VARCHAR(100) NULL, 
+    [ValorTotalServico] DECIMAL(18, 2) NULL, 
+    [ValorTotalPecas] DECIMAL(18, 2) NULL
 )

@@ -25,43 +25,30 @@ namespace DadosEInformacoes
 
             FbConnection fbConn = new FbConnection(fbcs.ToString());
 
-            DataTable tableNotas = PegarDadosNotas(fbcs, fbConn);
+            List<ServicoSeparado> servicos = PegarDadosServicos(fbcs, fbConn);
 
-            SalvarDadosVendas(tableNotas);
-            
-        }
+            Dictionary<long, ClienteSeparado> dicVendas = PegarDadosNotas(fbcs, fbConn);
+            SalvarDadosVendas(dicVendas, servicos);
 
-        [TestMethod]
-        public void InserirServicosSeparadas()
-        {
-            CarregarNomes();
-            CriarConexaoSQL();
-
-            FbConnectionStringBuilder fbcs = new FbConnectionStringBuilder();
-            fbcs.ConnectionString = strConn;
-            fbcs.Charset = "WIN1252";
-
-            FbConnection fbConn = new FbConnection(fbcs.ToString());
-
-            DataTable tableServico = PegarDadosServicos(fbcs, fbConn);
-
-            SalvarDadosServicos(tableServico);
         }
 
         private string strConn = @"DataSource=localhost; Database=D:\Thiago\DadosEInformacoes\Irmãos Neto\Dados.FDB; User=sysdba; password=masterkey";
         private string strconSQL = "Server=Intel;Database=DadosEInformacoes;Integrated Security=True;";
         private SqlConnection conexao;
         private SqlCommand command;
-        private SqlCommand commandServico;
-        private SqlCommand commandRevisaoAtrasada;
 
         Dictionary<string, string> dicNames = new Dictionary<string, string>();
         private void CriarConexaoSQL()
         {
             conexao = new SqlConnection(strconSQL);
             #region Vendas
-            string strcommand = "INSERT INTO Vendas (nome, Identificacao, tipopessoa, sexo, ticketmedio, ultimavenda, valortotal, valoritens, qtItens, datavenda, idnf,Veiculo,Placa,Ano,Km, FaixaAno, FaixaTicketMedio) VALUES" +
-           "(@nome, @Identificacao, @tipopessoa, @sexo, @ticketmedio, @ultimavenda, @valortotal, @valoritens, @qtItens, @datavenda, @idnf,@Veiculo, @Placa, @Ano, @Km,@FaixaAno, @FaixaTicketMedio)";
+            string strcommand = "INSERT INTO Vendas (nome, Identificacao, tipopessoa, sexo, ticketmedio, ultimavenda, valortotal, valoritens, qtItens," +
+                                    "datavenda, idnf,Veiculo,Placa,Ano,Km, FaixaAno, FaixaTicketMedio," +
+                                    "NomeServico, Funcionario, QtItensServico,TempoServico, TipoServico, ValorTotalServico, ValorUnitServico) VALUES" +
+                                    "(@nome, @Identificacao, @tipopessoa, @sexo, @ticketmedio, @ultimavenda, @valortotal, @valoritens, @qtItens," +
+                                    "@datavenda, @idnf,@Veiculo, @Placa, @Ano, @Km,@FaixaAno, @FaixaTicketMedio," +
+                                    "@NomeServico, @Funcionario, @QtItensServico,@TempoServico, @TipoServico, @ValorTotalServico, @ValorUnitServico)";
+            
             command = new SqlCommand(strcommand, conexao);
             command.Parameters.Add("@nome", SqlDbType.VarChar);
             command.Parameters.Add("@Identificacao", SqlDbType.BigInt);
@@ -81,35 +68,15 @@ namespace DadosEInformacoes
             command.Parameters.Add("@Km", SqlDbType.VarChar);
             command.Parameters.Add("@FaixaAno", SqlDbType.VarChar);
             command.Parameters.Add("@FaixaTicketMedio", SqlDbType.VarChar);
-            #endregion
 
-            #region Serivços
-            string strcmdServicos = @"INSERT INTO [dbo].[Servicos]
-                                       ([idnf],[TipoServico]
-                                       ,[NomeServico]
-                                       ,[Funcionario]
-                                       ,[Tempo]
-                                       ,[VlrUnit]
-                                       ,[QntItens]
-                                       ,[VlrTotal])
-                                    VALUES
-                                       (@idnf
-                                       ,@TipoServico
-                                       ,@NomeServico
-                                       ,@Funcionario
-                                       ,@Tempo
-                                       ,@VlrUnit
-                                       ,@QntItens
-                                       ,@VlrTotal)";
-            commandServico = new SqlCommand(strcmdServicos, conexao);
-            commandServico.Parameters.Add("@idnf", SqlDbType.BigInt);
-            commandServico.Parameters.Add("@TipoServico", SqlDbType.VarChar);
-            commandServico.Parameters.Add("@NomeServico", SqlDbType.VarChar);
-            commandServico.Parameters.Add("@Funcionario", SqlDbType.VarChar);
-            commandServico.Parameters.Add("@Tempo", SqlDbType.VarChar);
-            commandServico.Parameters.Add("@VlrUnit", SqlDbType.Decimal);
-            commandServico.Parameters.Add("@QntItens", SqlDbType.Int);
-            commandServico.Parameters.Add("@VlrTotal", SqlDbType.Decimal);
+            command.Parameters.Add("@NomeServico", SqlDbType.VarChar);
+            command.Parameters.Add("@Funcionario", SqlDbType.VarChar);
+            command.Parameters.Add("@QtItensServico", SqlDbType.Int);
+            command.Parameters.Add("@TempoServico", SqlDbType.VarChar);
+            command.Parameters.Add("@TipoServico", SqlDbType.VarChar);
+            command.Parameters.Add("@ValorTotalServico", SqlDbType.Decimal);
+            command.Parameters.Add("@ValorUnitServico", SqlDbType.Decimal);
+
             #endregion
         }
         private void CarregarNomes()
@@ -130,7 +97,7 @@ namespace DadosEInformacoes
                 }
             }
         }
-        private DataTable PegarDadosServicos(FbConnectionStringBuilder fbcs, FbConnection fbConn)
+        private List<ServicoSeparado> PegarDadosServicos(FbConnectionStringBuilder fbcs, FbConnection fbConn)
         {
             FbCommand fbCmd = new FbCommand(@"select
                                                     nf.idnf,
@@ -146,8 +113,7 @@ namespace DadosEInformacoes
                                                     empresa_nf_servico serv_nf on serv_nf.idnf = nf.idnf inner join
                                                     empresa_conta conta on conta.idconta = serv_nf.idfuncionario inner join
                                                     vendas_servico serv on serv.idservico = serv_nf.idservico inner join
-                                                    vendas_tiposervico tiposerv on tiposerv.idtiposervico = serv.idtiposervico
-                                                where nf.emissao > '01.01.2020'", fbConn);
+                                                    vendas_tiposervico tiposerv on tiposerv.idtiposervico = serv.idtiposervico", fbConn);
 
             DataTable dtService = new DataTable();
             try
@@ -165,9 +131,25 @@ namespace DadosEInformacoes
             {
                 fbConn.Close();
             }
-            return dtService;
+
+            List<ServicoSeparado> listServices = new List<ServicoSeparado>();
+
+            foreach (DataRow row in dtService.Rows)
+            {
+                ServicoSeparado servico = new ServicoSeparado();
+                servico.IDNF = Convert.ToInt32(row[0]);
+                servico.TipoServico = row[1].ToString();
+                servico.NomeServico = row[2].ToString();
+                servico.Funcionario = row[3].ToString();
+                servico.Tempo = row[4].ToString();
+                servico.VlrUnit = Convert.ToDouble(row[5]);
+                servico.QntItens = Convert.ToInt32(row[6]);
+                servico.VlrTotal = Convert.ToDouble(row[7]);
+                listServices.Add(servico);
+            }
+            return listServices;
         }
-        public DataTable PegarDadosNotas(FbConnectionStringBuilder fbcs, FbConnection fbConn)
+        public Dictionary<long, ClienteSeparado> PegarDadosNotas(FbConnectionStringBuilder fbcs, FbConnection fbConn)
         {
             FbCommand fbCmd = new FbCommand(@"select
                                                     nf.idnf,
@@ -212,20 +194,43 @@ namespace DadosEInformacoes
             {
                 fbConn.Close();
             }
-            return dtSales;
-        }
-        private void SalvarDadosVendas(DataTable tableNotas)
-        {
-            Dictionary<long, ClienteSeparado> dicVendas = new Dictionary<long, ClienteSeparado>();
-            MontarDicionarioVendas(tableNotas, dicVendas);
 
+            Dictionary<long, ClienteSeparado> dicVendas = new Dictionary<long, ClienteSeparado>();
+            MontarDicionarioVendas(dtSales, dicVendas);
+
+            return dicVendas;
+        }
+        private void SalvarDadosVendas(Dictionary<long, ClienteSeparado> dicVendas, List<ServicoSeparado> servicos)
+        {
             CalcularTicketMedio(dicVendas);
             PegarInfosVeiculos(dicVendas);
-            //RevisoesAtrasadas(dicVendas);
+            PegarInfosServicos(dicVendas, servicos);
 
-            #region Montar Relatório Clientes e vendas
             SalvarDadosVendas(dicVendas);
-            #endregion
+        }
+
+        private void PegarInfosServicos(Dictionary<long, ClienteSeparado> dicVendas, List<ServicoSeparado> servicos)
+        {
+            foreach (ClienteSeparado cliente in dicVendas.Values)
+            {
+                foreach (Venda venda in cliente.ListaVendas)
+                {
+                    ServicoSeparado servico = servicos.Where(s => s.IDNF == venda.IDNF).FirstOrDefault();
+                    if(servico != null) 
+                    {
+                        venda.Servico = new ServicoSeparado
+                        {
+                            NomeServico = servico.NomeServico,
+                            Funcionario = servico.Funcionario,
+                            QntItens = servico.QntItens,
+                            Tempo = servico.Tempo,
+                            TipoServico = servico.TipoServico,
+                            VlrTotal = servico.VlrTotal,
+                            VlrUnit = servico.VlrUnit
+                        };
+                    }
+                }
+            }
         }
         private void PegarInfosVeiculos(Dictionary<long, ClienteSeparado> dicVendas)
         {
@@ -358,14 +363,28 @@ namespace DadosEInformacoes
                         command.Parameters["@Km"].Value = String.IsNullOrEmpty(venda.KM) ? "Não Identificado" : venda.KM;
                         command.Parameters["@FaixaAno"].Value = String.IsNullOrEmpty(venda.FaixaAno) ? "Não Identificado" : venda.FaixaAno;
                         command.Parameters["@FaixaTicketmedio"].Value = cliente.FaixaTicketMedio;
+
+                        command.Parameters["@NomeServico"].Value = (venda.Servico != null) ? venda.Servico.NomeServico: "";
+                        command.Parameters["@Funcionario"].Value = (venda.Servico != null) ? venda.Servico.Funcionario : "";
+                        command.Parameters["@QtItensServico"].Value = (venda.Servico != null) ? venda.Servico.QntItens : 0;
+                        command.Parameters["@TempoServico"].Value = (venda.Servico != null) ? venda.Servico.Tempo : "0:00";
+                        command.Parameters["@TipoServico"].Value = (venda.Servico != null) ? venda.Servico.TipoServico : "";
+                        command.Parameters["@ValorTotalServico"].Value = (venda.Servico != null) ? venda.Servico.VlrTotal : 0;
+                        command.Parameters["@ValorUnitServico"].Value = (venda.Servico != null) ? venda.Servico.VlrUnit : 0;
+
                         command.ExecuteNonQuery();
                     }
                 }
-                conexao.Close();
+                
             }
             catch (Exception ex)
             {
-
+                Console.Write("Ocorreu um erro ao salvar os dados das vendas");
+                Console.Write(ex.ToString());
+            }
+            finally 
+            {
+                conexao.Close();
             }
         }
         private void MontarDicionarioVendas(DataTable tableNotas, Dictionary<long, ClienteSeparado> dicVendas)
@@ -487,46 +506,6 @@ namespace DadosEInformacoes
                 return "Não identificado";
             }
         }
-        private void SalvarDadosServicos(DataTable tableServico)
-        {
-            List<ServicoSeparado> listServices = new List<ServicoSeparado>();
-
-            foreach (DataRow row in tableServico.Rows)
-            {
-                ServicoSeparado servico = new ServicoSeparado();
-                servico.IDNF = Convert.ToInt32(row[0]);
-                servico.TipoServico = row[1].ToString();
-                servico.NomeServico = row[2].ToString();
-                servico.Funcionario = row[3].ToString();
-                servico.Tempo = row[4].ToString();
-                servico.VlrUnit = Convert.ToDouble(row[5]);
-                servico.QntItens = Convert.ToInt32(row[6]);
-                servico.VlrTotal = Convert.ToDouble(row[7]);
-                listServices.Add(servico);
-            }
-
-            try
-            {
-                conexao.Open();
-                foreach (ServicoSeparado servico in listServices)
-                {
-                    commandServico.Parameters["@IDNF"].Value = servico.IDNF;
-                    commandServico.Parameters["@TipoServico"].Value = servico.TipoServico;
-                    commandServico.Parameters["@NomeServico"].Value = servico.NomeServico;
-                    commandServico.Parameters["@Funcionario"].Value = servico.Funcionario;
-                    commandServico.Parameters["@Tempo"].Value = servico.Tempo;
-                    commandServico.Parameters["@VlrUnit"].Value = servico.VlrUnit;
-                    commandServico.Parameters["@QntItens"].Value = servico.QntItens;
-                    commandServico.Parameters["@VlrTotal"].Value = servico.VlrTotal;
-                    commandServico.ExecuteNonQuery();
-                }
-                conexao.Close();
-            }
-            catch (Exception ex)
-            {
-
-            }
-        }
         private string PegarSexo(string nome, string tipopessoa)
         {
             if (tipopessoa == "Juridica")
@@ -535,7 +514,7 @@ namespace DadosEInformacoes
             if (dicNames.ContainsKey(primeiroNome))
                 return dicNames[primeiroNome];
             else
-                return "Indefinido";
+                return "Não Identificado";
         }
     }
 
@@ -566,6 +545,7 @@ namespace DadosEInformacoes
         public string KM;
         public string Ano;
         public string FaixaAno;
+        public ServicoSeparado Servico;
     }
 
     public class ServicoSeparado

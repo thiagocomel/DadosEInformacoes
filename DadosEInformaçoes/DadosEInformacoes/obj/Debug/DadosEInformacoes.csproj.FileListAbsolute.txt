@@ -1,3 +1,4 @@
+D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\bin\Debug\Arquivos\nomes.csv
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\bin\Debug\Microsoft.VisualStudio.TestPlatform.MSTest.TestAdapter.dll
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\bin\Debug\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.Interface.dll
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\bin\Debug\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
@@ -7,6 +8,7 @@ D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\bin\Deb
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\bin\Debug\DadosEInformacoes.dll
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\bin\Debug\DadosEInformacoes.pdb
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\bin\Debug\Dapper.dll
+D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\bin\Debug\FirebirdSql.Data.FirebirdClient.dll
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.dll
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\bin\Debug\Dapper.xml
@@ -16,5 +18,4 @@ D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\obj\Deb
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\obj\Debug\DadosEInformacoes.csproj.CopyComplete
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\obj\Debug\DadosEInformacoes.dll
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\obj\Debug\DadosEInformacoes.pdb
-D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\bin\Debug\FirebirdSql.Data.FirebirdClient.dll
-D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\bin\Debug\Arquivos\nomes.csv
+D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DadosEInformacoes\obj\Debug\DadosEInformacoes.csprojAssemblyReference.cache
