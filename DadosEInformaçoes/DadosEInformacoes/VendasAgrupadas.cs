@@ -34,6 +34,8 @@ namespace DadosEInformacoes
         public string TipoServico { get; set; }
         public decimal ValorTotalServico { get; set; }
         public decimal ValorUnitServico { get; set; }
+        public string FormaPagto { get; set; }
+        public string CondPagto { get; set; }
     }
     public class VendaAgrupada
     {
@@ -56,6 +58,8 @@ namespace DadosEInformacoes
         public string NomeServico { get; set; }
         public string Funcionario { get; set; }
         public decimal ValorTotalServico { get; set; }
+        public string FormaPagto { get; set; }
+        public string CondPagto { get; set; }
         public string IdNFAgrupado
         {
             get
@@ -211,6 +215,8 @@ namespace DadosEInformacoes
                           ,[TipoServico]
                           ,[ValorTotalServico]
                           ,[ValorUnitServico]
+                          ,[FormaPagto]
+                          ,[CondPagto]
                       FROM [dbo].[Vendas]";
 
             var vendasSeparadas = _db.Query<VendaSeparada>(sql);
@@ -342,6 +348,8 @@ namespace DadosEInformacoes
                           ,[TipoServico]
                           ,[ValorTotalServico]
                           ,[ValorUnitServico]
+                          ,[FormaPagto]
+                          ,[CondPagto]
                       FROM 
                            [dbo].[Vendas]";
 
@@ -368,7 +376,9 @@ namespace DadosEInformacoes
                                 ,[TipoServico]
                                 ,[NomeServico]
                                 ,[Funcionario]
-                                ,[ValorTotalServico])
+                                ,[ValorTotalServico]
+                              ,[FormaPagto]
+                              ,[CondPagto])
                             VALUES
                                 (@Nome
                                 ,@Identificacao
@@ -388,7 +398,9 @@ namespace DadosEInformacoes
                                 ,@TipoServico
                                 ,@NomeServico
                                 ,@Funcionario
-                                ,@ValorTotalServico)";
+                                ,@ValorTotalServico
+                                ,@FormaPagto
+                              ,@CondPagto)";
 
             using (var connection = new SqlConnection(CONNECTION_STRING))
             {
@@ -501,6 +513,105 @@ namespace DadosEInformacoes
                 Console.WriteLine($"Affected Rows: {affectedRows}");
             }
         }
+
+        //[TestMethod]
+        //public void InserirVendasGarantia_Ok()
+        //{
+        //    var sqlSelect = @"SELECT [Nome]
+        //                  ,[Identificacao]
+        //                  ,[TipoPessoa]
+        //                  ,[Sexo]
+        //                  ,[TicketMedio]
+        //                  ,[UltimaVenda]
+        //                  ,[ValorTotalAgrupado]
+        //                  ,[DataVenda]
+        //                  ,[IdNFAgrupado]
+        //                  ,[Veiculo]
+        //                  ,[Ano]
+        //                  ,[Placa]
+        //                  ,[Km]
+        //                  ,[FaixaAno]
+        //                  ,[FaixaTicketMedio]
+        //                  ,[TipoServico]
+        //                  ,[NomeServico]
+        //                  ,[Funcionario]
+        //                  ,[ValorTotalServico]
+        //                  ,[ValorTotalPecas]
+        //              FROM 
+        //                   [dbo].[VendasAgrupadas]";
+
+        //    var vendasAgrupadas = _db.Query<VendaAgrupada>(sqlSelect).ToList();
+
+        //    Dictionary<long, Cliente> dicVendas = new Dictionary<long, Cliente>();
+        //    List<VendaAtrasada> vendasAtrasadas = new List<VendaAtrasada>();
+        //    foreach (VendaAgrupada venda in vendasAgrupadas)
+        //    {
+        //        if (dicVendas.ContainsKey(venda.Identificacao))
+        //            dicVendas[venda.Identificacao].ListaVendas.Add(venda);
+        //        else
+        //        {
+        //            Cliente cliente = new Cliente
+        //            {
+        //                FaixaTicketMedio = venda.FaixaTicketMedio,
+        //                Indentificacao = venda.Identificacao,
+        //                Nome = venda.Nome,
+        //                Sexo = venda.Sexo,
+        //                TicketMedio = venda.TicketMedio,
+        //                TipoPessoa = venda.TipoPessoa,
+        //                UltimaVenda = venda.UltimaVenda
+        //            };
+        //            dicVendas.Add(venda.Identificacao, cliente);
+        //            dicVendas[cliente.Indentificacao].ListaVendas.Add(venda);
+        //        }
+        //    }
+
+        //    foreach (Cliente cliente in dicVendas.Values)
+        //    {
+        //        DateTime vendaAnterior = cliente.ListaVendas[0].DataVenda;
+        //        bool isFirst = true;
+        //        foreach (VendaAgrupada venda in cliente.ListaVendas)
+        //        {
+        //            int dias = (venda.DataVenda - vendaAnterior).Days;
+        //            if (dias < 7 && !isFirst)
+        //                vendasAtrasadas.Add(new VendaAtrasada(venda));
+        //            isFirst = false;
+        //        }
+        //    }
+
+        //    var sqlInsert = @"INSERT INTO[dbo].[VendasAtrasadas]
+        //                                  ([Nome]
+        //                                  ,[Identificacao]
+        //                                  ,[UltimaVenda]
+        //                                  ,[TicketMedio]
+        //                                  ,[TipoPessoa]
+        //                                  ,[Sexo]
+        //                                  ,[Veiculo]
+        //                                  ,[Placa]
+        //                                  ,[Ano]
+        //                                  ,[Km]
+        //                                  ,[FaixaAno]
+        //                                  ,[FaixaTicketMedio])
+        //                            VALUES
+        //                                  (@Nome
+        //                                   ,@Identificacao
+        //                                   ,@UltimaVenda
+        //                                   ,@TicketMedio
+        //                                   ,@TipoPessoa
+        //                                   ,@Sexo
+        //                                   ,@Veiculo
+        //                                   ,@Placa
+        //                                   ,@Ano
+        //                                   ,@Km
+        //                                   ,@FaixaAno
+        //                                   ,@FaixaTicketMedio)";
+
+        //    using (var connection = new SqlConnection(CONNECTION_STRING))
+        //    {
+        //        var affectedRows = connection.Execute(sqlInsert, vendasAtrasadas);
+
+        //        Console.WriteLine($"Affected Rows: {affectedRows}");
+        //    }
+        //}
         private List<VendaAgrupada> AgruparVendas(IEnumerable<VendaSeparada> vendasSeparadas)
         {
             var vendasAgrupadas = new Dictionary<IdentificacaoVenda, VendaAgrupada>();
@@ -534,6 +645,10 @@ namespace DadosEInformacoes
                         vendaAgrupada.ValorTotalServico = item.ValorTotalServico;
                     if (String.IsNullOrEmpty(item.Funcionario) == false)
                         vendaAgrupada.Funcionario = item.Funcionario;
+                    if (String.IsNullOrEmpty(item.FormaPagto) == false)
+                        vendaAgrupada.FormaPagto = item.FormaPagto;
+                    if (String.IsNullOrEmpty(item.CondPagto) == false)
+                        vendaAgrupada.CondPagto = item.CondPagto;
 
                     vendaAgrupada.AdicionarValorTotal(item.ValorTotal);
                     vendaAgrupada.AdicionarIdNF(item.IdNF);
@@ -555,6 +670,10 @@ namespace DadosEInformacoes
                         vendaAgrupada.ValorTotalServico = item.ValorTotalServico;
                     if (String.IsNullOrEmpty(item.Funcionario) == false)
                         vendaAgrupada.Funcionario = item.Funcionario;
+                    if (String.IsNullOrEmpty(item.FormaPagto) == false)
+                        vendaAgrupada.FormaPagto = item.FormaPagto;
+                    if (String.IsNullOrEmpty(item.CondPagto) == false)
+                        vendaAgrupada.CondPagto = item.CondPagto;
                 }
             }
 

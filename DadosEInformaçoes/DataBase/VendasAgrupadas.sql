@@ -20,5 +20,7 @@
     [NomeServico] VARCHAR(200) NULL, 
     [Funcionario] VARCHAR(100) NULL, 
     [ValorTotalServico] DECIMAL(18, 2) NULL, 
-    [ValorTotalPecas] DECIMAL(18, 2) NULL
+    [ValorTotalPecas] DECIMAL(18, 2) NULL, 
+    [FormaPagto] VARCHAR(100) NULL, 
+    [CondPagto] VARCHAR(100) NULL
 )

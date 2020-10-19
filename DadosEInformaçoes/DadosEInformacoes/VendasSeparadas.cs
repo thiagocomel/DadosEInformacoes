@@ -44,10 +44,10 @@ namespace DadosEInformacoes
             #region Vendas
             string strcommand = "INSERT INTO Vendas (nome, Identificacao, tipopessoa, sexo, ticketmedio, ultimavenda, valortotal, valoritens, qtItens," +
                                     "datavenda, idnf,Veiculo,Placa,Ano,Km, FaixaAno, FaixaTicketMedio," +
-                                    "NomeServico, Funcionario, QtItensServico,TempoServico, TipoServico, ValorTotalServico, ValorUnitServico) VALUES" +
+                                    "NomeServico, Funcionario, QtItensServico,TempoServico, TipoServico, ValorTotalServico, ValorUnitServico, FormaPagto, CondPagto) VALUES" +
                                     "(@nome, @Identificacao, @tipopessoa, @sexo, @ticketmedio, @ultimavenda, @valortotal, @valoritens, @qtItens," +
                                     "@datavenda, @idnf,@Veiculo, @Placa, @Ano, @Km,@FaixaAno, @FaixaTicketMedio," +
-                                    "@NomeServico, @Funcionario, @QtItensServico,@TempoServico, @TipoServico, @ValorTotalServico, @ValorUnitServico)";
+                                    "@NomeServico, @Funcionario, @QtItensServico,@TempoServico, @TipoServico, @ValorTotalServico, @ValorUnitServico, @FormaPagto, @CondPagto)";
             
             command = new SqlCommand(strcommand, conexao);
             command.Parameters.Add("@nome", SqlDbType.VarChar);
@@ -76,6 +76,9 @@ namespace DadosEInformacoes
             command.Parameters.Add("@TipoServico", SqlDbType.VarChar);
             command.Parameters.Add("@ValorTotalServico", SqlDbType.Decimal);
             command.Parameters.Add("@ValorUnitServico", SqlDbType.Decimal);
+
+            command.Parameters.Add("@FormaPagto", SqlDbType.VarChar);
+            command.Parameters.Add("@CondPagto", SqlDbType.VarChar);
 
             #endregion
         }
@@ -152,31 +155,48 @@ namespace DadosEInformacoes
         public Dictionary<long, ClienteSeparado> PegarDadosNotas(FbConnectionStringBuilder fbcs, FbConnection fbConn)
         {
             FbCommand fbCmd = new FbCommand(@"select
-                                                    nf.idnf,
-                                                    conta.nome,
-                                                    conta.cpf,
-                                                    conta.cnpj,
-                                                    conta.pessoa,
-                                                    nf.vlrtotal, 
-                                                    nf.emissao,
-                                                    sum (prod.vlrunitario * prod.qtde) as vlrItens,
-                                                    sum (prod.cmedio * prod.qtde) as vlrCustoItens,
-                                                    count(prod.idnf_prod * prod.qtde) as qntprod,
-                                                    nf.dadosadicionais
-                                                from
-                                                          empresa_nf as nf left join
-                                                          empresa_nf_prod as prod on prod.idnf = nf.idnf inner join
-                                                          empresa_conta as conta on conta.idconta = nf.idconta
-                                                 where nf.cancelada = 'N' and  nf.terceiro = 'N' and nf.idnatoperacao not in (10,11,12,36,37,52,53,54,58)
-                                                group by
-                                                    nf.idnf,
-                                                    conta.nome,
-                                                    conta.cpf,
-                                                    conta.cnpj,
-                                                    conta.pessoa,
-                                                    nf.vlrtotal,
-                                                    nf.emissao,
-                                                    nf.dadosadicionais", fbConn);
+                                                nf.idnf,
+                                                conta.nome,
+                                                conta.cpf,
+                                                conta.cnpj,
+                                                conta.pessoa,
+                                                nf.vlrtotal, 
+                                                nf.emissao,
+                                                sum (prod.vlrunitario * prod.qtde) as vlrItens,
+                                                sum (prod.cmedio * prod.qtde) as vlrCustoItens,
+                                                count(prod.idnf_prod * prod.qtde) as qntprod,
+                                                nf.dadosadicionais,
+                                                formpag.nome as formPagto,
+                                                condpag.nome as condPagto,
+                                                conta.fone1,
+                                                conta.fone2,
+                                                conta.fone3,
+                                                conta.fone4
+                                            from
+                                                  empresa_nf as nf left join
+                                                  empresa_nf_prod as prod on prod.idnf = nf.idnf inner join
+                                                  empresa_conta as conta on conta.idconta = nf.idconta inner join
+                                                  vendas_condpagto as condpag on nf.idcondpagto = condpag.idcondpagto inner join
+                                                  empresa_fpagto as formpag on nf.idfpagto = formpag.idfpagto
+                                            where
+                                                nf.cancelada = 'N' and
+                                                nf.terceiro = 'N' and
+                                                nf.idnatoperacao not in (10,11,12,36,37,52,53,54,58)
+                                            group by
+                                                nf.idnf,
+                                                conta.nome,
+                                                conta.cpf,
+                                                conta.cnpj,
+                                                conta.pessoa,
+                                                nf.vlrtotal,
+                                                nf.emissao,
+                                                nf.dadosadicionais,
+                                                formpag.nome,
+                                                condpag.nome,
+                                                conta.fone1,
+                                                conta.fone2,
+                                                conta.fone3,
+                                                conta.fone4", fbConn);
 
             DataTable dtSales = new DataTable();
             try
@@ -208,7 +228,6 @@ namespace DadosEInformacoes
 
             SalvarDadosVendas(dicVendas);
         }
-
         private void PegarInfosServicos(Dictionary<long, ClienteSeparado> dicVendas, List<ServicoSeparado> servicos)
         {
             foreach (ClienteSeparado cliente in dicVendas.Values)
@@ -372,6 +391,9 @@ namespace DadosEInformacoes
                         command.Parameters["@ValorTotalServico"].Value = (venda.Servico != null) ? venda.Servico.VlrTotal : 0;
                         command.Parameters["@ValorUnitServico"].Value = (venda.Servico != null) ? venda.Servico.VlrUnit : 0;
 
+                        command.Parameters["@FormaPagto"].Value = venda.FormaPagto;
+                        command.Parameters["@CondPagto"].Value = venda.CondPagto;
+
                         command.ExecuteNonQuery();
                     }
                 }
@@ -413,7 +435,9 @@ namespace DadosEInformacoes
                 if ((row[9] is DBNull) == false)
                     venda.QntItens = Convert.ToInt16(row[9]);
                 venda.DadosAdicionais = row[10].ToString();
-
+                venda.FormaPagto = row[11].ToString();
+                venda.CondPagto = row[12].ToString();
+                
                 if (dicVendas.ContainsKey(cliente.Indentificacao))
                     dicVendas[cliente.Indentificacao].ListaVendas.Add(venda);
                 else
@@ -545,6 +569,8 @@ namespace DadosEInformacoes
         public string KM;
         public string Ano;
         public string FaixaAno;
+        public string FormaPagto;
+        public string CondPagto;
         public ServicoSeparado Servico;
     }
 

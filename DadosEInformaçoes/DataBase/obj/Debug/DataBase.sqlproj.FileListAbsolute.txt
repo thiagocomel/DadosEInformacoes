@@ -3,4 +3,3 @@ D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DataBase\bin\Debug\DataBa
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DataBase\bin\Debug\DataBase.pdb
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DataBase\obj\Debug\DataBase.dll
 D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DataBase\obj\Debug\DataBase.pdb
-D:\Thiago\DadosEInformacoes\Projeto\DadosEInformaçoes\DataBase\obj\Debug\DataBase.sqlprojAssemblyReference.cache
