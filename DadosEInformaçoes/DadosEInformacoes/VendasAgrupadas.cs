@@ -14,6 +14,7 @@ namespace DadosEInformacoes
         public long Identificacao { get; set; }
         public string TipoPessoa { get; set; }
         public string Sexo { get; set; }
+        public string Telefone { get; set; }
         public decimal TicketMedio { get; set; }
         public DateTime UltimaVenda { get; set; }
         public decimal ValorTotal { get; set; }
@@ -43,6 +44,7 @@ namespace DadosEInformacoes
         public long Identificacao { get; set; }
         public string TipoPessoa { get; set; }
         public string Sexo { get; set; }
+        public string Telefone { get; set; }
         public decimal TicketMedio { get; set; }
         public DateTime UltimaVenda { get; set; }
         public DateTime DataVenda { get; set; }
@@ -328,10 +330,12 @@ namespace DadosEInformacoes
         [TestMethod]
         public void InserirVendasAgruapdas_Ok()
         {
-            var sqlSelect = @"SELECT [Nome]
+            var sqlSelect = @"SELECT 
+                           [Nome]
                           ,[Identificacao]
                           ,[TipoPessoa]
                           ,[Sexo]
+                          ,[Telefone]
                           ,[TicketMedio]
                           ,[UltimaVenda]
                           ,[ValorTotal]
@@ -366,6 +370,7 @@ namespace DadosEInformacoes
                                 ,[Identificacao]
                                 ,[TipoPessoa]
                                 ,[Sexo]
+                                ,[Telefone]
                                 ,[TicketMedio]
                                 ,[UltimaVenda]
                                 ,[ValorTotalAgrupado]
@@ -392,6 +397,7 @@ namespace DadosEInformacoes
                                 ,@Identificacao
                                 ,@TipoPessoa
                                 ,@Sexo
+                                ,@Telefone
                                 ,@TicketMedio
                                 ,@UltimaVenda
                                 ,@ValorTotalAgrupado
@@ -640,6 +646,7 @@ namespace DadosEInformacoes
                     vendaAgrupada.Identificacao = item.Identificacao;
                     vendaAgrupada.TipoPessoa = item.TipoPessoa;
                     vendaAgrupada.Sexo = item.Sexo;
+                    vendaAgrupada.Telefone = item.Telefone;
                     vendaAgrupada.TicketMedio = item.TicketMedio;
                     vendaAgrupada.UltimaVenda = item.UltimaVenda;
                     vendaAgrupada.DataVenda = item.DataVenda;
@@ -658,7 +665,7 @@ namespace DadosEInformacoes
                         vendaAgrupada.NomeServico = item.NomeServico;
                     if (item.ValorTotalServico > 0)
                         vendaAgrupada.ValorTotalServico = item.ValorTotalServico;
-                    if (item.ValorItens  > 0)
+                    if (item.ValorItens > 0)
                         vendaAgrupada.ValorTotalPecas = item.ValorItens;
                     if (String.IsNullOrEmpty(item.Funcionario) == false)
                         vendaAgrupada.Funcionario = item.Funcionario;
@@ -666,7 +673,7 @@ namespace DadosEInformacoes
                         vendaAgrupada.FormaPagto = item.FormaPagto;
                     if (String.IsNullOrEmpty(item.CondPagto) == false)
                         vendaAgrupada.CondPagto = item.CondPagto;
-                    
+
                     vendaAgrupada.AdicionarValorTotal(item.ValorTotal);
                     vendaAgrupada.AdicionarIdNF(item.IdNF);
                     vendasAgrupadas.Add(id, vendaAgrupada);

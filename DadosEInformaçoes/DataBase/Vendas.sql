@@ -26,5 +26,6 @@
     [ValorTotalServico] DECIMAL(18, 2) NULL, 
     [ValorUnitServico] DECIMAL(18, 2) NULL, 
     [FormaPagto] VARCHAR(100) NULL, 
-    [CondPagto] VARCHAR(100) NULL 
+    [CondPagto] VARCHAR(100) NULL, 
+    [Telefone] VARCHAR(200) NULL 
 )

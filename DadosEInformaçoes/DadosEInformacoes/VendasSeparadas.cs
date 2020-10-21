@@ -42,18 +42,19 @@ namespace DadosEInformacoes
         {
             conexao = new SqlConnection(strconSQL);
             #region Vendas
-            string strcommand = "INSERT INTO Vendas (nome, Identificacao, tipopessoa, sexo, ticketmedio, ultimavenda, valortotal, valoritens, qtItens," +
+            string strcommand = "INSERT INTO Vendas (nome, Identificacao, tipopessoa, sexo, telefone, ticketmedio, ultimavenda, valortotal, valoritens, qtItens," +
                                     "datavenda, idnf,Veiculo,Placa,Ano,Km, FaixaAno, FaixaTicketMedio," +
                                     "NomeServico, Funcionario, QtItensServico,TempoServico, TipoServico, ValorTotalServico, ValorUnitServico, FormaPagto, CondPagto) VALUES" +
-                                    "(@nome, @Identificacao, @tipopessoa, @sexo, @ticketmedio, @ultimavenda, @valortotal, @valoritens, @qtItens," +
+                                    "(@nome, @Identificacao, @tipopessoa, @sexo, @telefone, @ticketmedio, @ultimavenda, @valortotal, @valoritens, @qtItens," +
                                     "@datavenda, @idnf,@Veiculo, @Placa, @Ano, @Km,@FaixaAno, @FaixaTicketMedio," +
                                     "@NomeServico, @Funcionario, @QtItensServico,@TempoServico, @TipoServico, @ValorTotalServico, @ValorUnitServico, @FormaPagto, @CondPagto)";
-            
+
             command = new SqlCommand(strcommand, conexao);
             command.Parameters.Add("@nome", SqlDbType.VarChar);
             command.Parameters.Add("@Identificacao", SqlDbType.BigInt);
             command.Parameters.Add("@tipopessoa", SqlDbType.VarChar);
             command.Parameters.Add("@sexo", SqlDbType.VarChar);
+            command.Parameters.Add("@Telefone", SqlDbType.VarChar);
             command.Parameters.Add("@ticketmedio", SqlDbType.Decimal);
             command.Parameters.Add("@ultimavenda", SqlDbType.DateTime);
             command.Parameters.Add("@valortotal", SqlDbType.Decimal);
@@ -235,7 +236,7 @@ namespace DadosEInformacoes
                 foreach (Venda venda in cliente.ListaVendas)
                 {
                     ServicoSeparado servico = servicos.Where(s => s.IDNF == venda.IDNF).FirstOrDefault();
-                    if(servico != null) 
+                    if (servico != null)
                     {
                         venda.Servico = new ServicoSeparado
                         {
@@ -369,6 +370,7 @@ namespace DadosEInformacoes
                         command.Parameters["@Identificacao"].Value = cliente.Indentificacao;
                         command.Parameters["@tipopessoa"].Value = cliente.TipoPessoa;
                         command.Parameters["@sexo"].Value = cliente.Sexo;
+                        command.Parameters["@telefone"].Value = cliente.Telefone;
                         command.Parameters["@ticketmedio"].Value = cliente.TicketMedio.ToString().Replace('.', ',');
                         command.Parameters["@ultimavenda"].Value = cliente.UltimaVenda.ToString("yyyy-MM-ddTHH:mm:ss");
                         command.Parameters["@valortotal"].Value = venda.Valor.ToString().Replace('.', ',');
@@ -383,7 +385,7 @@ namespace DadosEInformacoes
                         command.Parameters["@FaixaAno"].Value = String.IsNullOrEmpty(venda.FaixaAno) ? "Não Identificado" : venda.FaixaAno;
                         command.Parameters["@FaixaTicketmedio"].Value = cliente.FaixaTicketMedio;
 
-                        command.Parameters["@NomeServico"].Value = (venda.Servico != null) ? venda.Servico.NomeServico: "";
+                        command.Parameters["@NomeServico"].Value = (venda.Servico != null) ? venda.Servico.NomeServico : "";
                         command.Parameters["@Funcionario"].Value = (venda.Servico != null) ? venda.Servico.Funcionario : "";
                         command.Parameters["@QtItensServico"].Value = (venda.Servico != null) ? venda.Servico.QntItens : 0;
                         command.Parameters["@TempoServico"].Value = (venda.Servico != null) ? venda.Servico.Tempo : "0:00";
@@ -397,14 +399,13 @@ namespace DadosEInformacoes
                         command.ExecuteNonQuery();
                     }
                 }
-                
             }
             catch (Exception ex)
             {
                 Console.Write("Ocorreu um erro ao salvar os dados das vendas");
                 Console.Write(ex.ToString());
             }
-            finally 
+            finally
             {
                 conexao.Close();
             }
@@ -424,6 +425,21 @@ namespace DadosEInformacoes
                 string vlrItens = Convert.ToDouble(row.ItemArray[5].ToString()).ToString().Replace(',', '.');
                 cliente.Sexo = PegarSexo(cliente.Nome, cliente.TipoPessoa);
 
+                List<string> fones = new List<string>();
+
+                if ((row[13] is DBNull) == false)
+                    fones.Add(row[13].ToString());
+                if ((row[14] is DBNull) == false)
+                    fones.Add(row[14].ToString());
+                if ((row[15] is DBNull) == false)
+                    fones.Add(row[15].ToString());
+                if ((row[16] is DBNull) == false)
+                    fones.Add(row[16].ToString());
+
+
+                cliente.Telefone = string.Join(" / ", fones);
+
+
                 Venda venda = new Venda();
                 venda.IDNF = Convert.ToInt32(row[0]);
                 venda.Valor = Convert.ToDouble(row[5]);
@@ -437,7 +453,7 @@ namespace DadosEInformacoes
                 venda.DadosAdicionais = row[10].ToString();
                 venda.FormaPagto = row[11].ToString();
                 venda.CondPagto = row[12].ToString();
-                
+
                 if (dicVendas.ContainsKey(cliente.Indentificacao))
                     dicVendas[cliente.Indentificacao].ListaVendas.Add(venda);
                 else
@@ -553,6 +569,7 @@ namespace DadosEInformacoes
         public string TipoPessoa;
         public List<Venda> ListaVendas = new List<Venda>();
         public bool RevisaoAtrasada;
+        public string Telefone;
     }
 
     public class Venda
