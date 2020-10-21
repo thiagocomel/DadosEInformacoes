@@ -9,6 +9,9 @@
     [UltimaVenda] DATETIME NULL, 
     [ValorTotalAgrupado] DECIMAL(18, 2) NULL, 
     [DataVenda] DATETIME NULL, 
+    [DataVendaAno] VARCHAR(4) NULL, 
+    [DataVendaMes] VARCHAR(2) NULL, 
+    [DataVendaDia] VARCHAR(2) NULL,
     [IdNFAgrupado] VARCHAR(MAX) NULL, 
     [Veiculo] VARCHAR(MAX) NULL, 
     [Ano] VARCHAR(MAX) NULL, 
@@ -22,5 +25,6 @@
     [ValorTotalServico] DECIMAL(18, 2) NULL, 
     [ValorTotalPecas] DECIMAL(18, 2) NULL, 
     [FormaPagto] VARCHAR(100) NULL, 
-    [CondPagto] VARCHAR(100) NULL
+    [CondPagto] VARCHAR(100) NULL, 
+
 )

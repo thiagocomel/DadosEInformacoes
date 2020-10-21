@@ -46,6 +46,9 @@ namespace DadosEInformacoes
         public decimal TicketMedio { get; set; }
         public DateTime UltimaVenda { get; set; }
         public DateTime DataVenda { get; set; }
+        public int DataVendaAno { get; set; }
+        public int DataVendaMes { get; set; }
+        public int DataVendaDia { get; set; }
         public string Veiculo { get; set; }
         public string Ano { get; set; }
         public string Placa { get; set; }
@@ -105,7 +108,7 @@ namespace DadosEInformacoes
                 this.FaixaTicketMedio = "Médio";
             else if (TicketMedio < 1000)
                 this.FaixaTicketMedio = "Alto";
-            else
+            else if (TicketMedio > 1000)
                 this.FaixaTicketMedio = "Muito Alto";
         }
     }
@@ -367,6 +370,9 @@ namespace DadosEInformacoes
                                 ,[UltimaVenda]
                                 ,[ValorTotalAgrupado]
                                 ,[DataVenda]
+                                ,[DataVendaAno]
+                                ,[DataVendaMes]
+                                ,[DataVendaDia]
                                 ,[IdNFAgrupado]
                                 ,[Veiculo]
                                 ,[Ano]
@@ -378,8 +384,9 @@ namespace DadosEInformacoes
                                 ,[NomeServico]
                                 ,[Funcionario]
                                 ,[ValorTotalServico]
-                              ,[FormaPagto]
-                              ,[CondPagto])
+                                ,[ValorTotalPecas]
+                                ,[FormaPagto]
+                                ,[CondPagto])
                             VALUES
                                 (@Nome
                                 ,@Identificacao
@@ -389,6 +396,9 @@ namespace DadosEInformacoes
                                 ,@UltimaVenda
                                 ,@ValorTotalAgrupado
                                 ,@DataVenda
+                                ,@DataVendaAno
+                                ,@DataVendaMes
+                                ,@DataVendaDia
                                 ,@IdNFAgrupado
                                 ,@Veiculo
                                 ,@Ano
@@ -400,8 +410,9 @@ namespace DadosEInformacoes
                                 ,@NomeServico
                                 ,@Funcionario
                                 ,@ValorTotalServico
+                                ,@ValorTotalPecas
                                 ,@FormaPagto
-                              ,@CondPagto)";
+                                ,@CondPagto)";
 
             using (var connection = new SqlConnection(CONNECTION_STRING))
             {
@@ -632,6 +643,9 @@ namespace DadosEInformacoes
                     vendaAgrupada.TicketMedio = item.TicketMedio;
                     vendaAgrupada.UltimaVenda = item.UltimaVenda;
                     vendaAgrupada.DataVenda = item.DataVenda;
+                    vendaAgrupada.DataVendaAno = item.DataVenda.Year;
+                    vendaAgrupada.DataVendaMes = item.DataVenda.Month;
+                    vendaAgrupada.DataVendaDia = item.DataVenda.Day;
                     vendaAgrupada.Veiculo = item.Veiculo;
                     vendaAgrupada.Ano = item.Ano;
                     vendaAgrupada.Placa = item.Placa;
@@ -671,6 +685,8 @@ namespace DadosEInformacoes
                         vendaAgrupada.NomeServico = item.NomeServico;
                     if (item.ValorTotalServico > 0)
                         vendaAgrupada.ValorTotalServico = item.ValorTotalServico;
+                    if (item.ValorItens > 0)
+                        vendaAgrupada.ValorTotalPecas = item.ValorItens;
                     if (String.IsNullOrEmpty(item.Funcionario) == false)
                         vendaAgrupada.Funcionario = item.Funcionario;
                     if (String.IsNullOrEmpty(item.FormaPagto) == false)
