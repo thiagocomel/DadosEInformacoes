@@ -58,6 +58,7 @@ namespace DadosEInformacoes
         public string NomeServico { get; set; }
         public string Funcionario { get; set; }
         public decimal ValorTotalServico { get; set; }
+        public decimal ValorTotalPecas { get; set; }
         public string FormaPagto { get; set; }
         public string CondPagto { get; set; }
         public string IdNFAgrupado
@@ -643,13 +644,15 @@ namespace DadosEInformacoes
                         vendaAgrupada.NomeServico = item.NomeServico;
                     if (item.ValorTotalServico > 0)
                         vendaAgrupada.ValorTotalServico = item.ValorTotalServico;
+                    if (item.ValorItens  > 0)
+                        vendaAgrupada.ValorTotalPecas = item.ValorItens;
                     if (String.IsNullOrEmpty(item.Funcionario) == false)
                         vendaAgrupada.Funcionario = item.Funcionario;
                     if (String.IsNullOrEmpty(item.FormaPagto) == false)
                         vendaAgrupada.FormaPagto = item.FormaPagto;
                     if (String.IsNullOrEmpty(item.CondPagto) == false)
                         vendaAgrupada.CondPagto = item.CondPagto;
-
+                    
                     vendaAgrupada.AdicionarValorTotal(item.ValorTotal);
                     vendaAgrupada.AdicionarIdNF(item.IdNF);
                     vendasAgrupadas.Add(id, vendaAgrupada);
